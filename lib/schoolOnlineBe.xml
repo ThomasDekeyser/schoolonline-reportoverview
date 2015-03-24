@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<!-- EDIT credentials at schoolonline.be -->
+	<var-def name="login">sarah.claeys@sintjv.be</var-def>
+	<var-def name="pwd"></var-def>
+
+
+	<!-- DO NOT EDIT -->
+	<var-def name="url"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWStart.php]]></var-def>
+	<var-def name="urllogin"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWLogIn.php]]></var-def>
+	<var-def name="urlpunten"><![CDATA[https://bsvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
+	<var-def name="urlpuntenEdit"><![CDATA[https://bsvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
+	<var-def name="url2"><![CDATA[https://bsvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=601&PuntenboekLeerkrachtViewStatePeriodeID=74]]></var-def>
+	<var-def name="userAgent"><![CDATA[Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:36.0) Gecko/20100101 Firefox/36.0]]></var-def>
+
+    <!-- define script functions and variables -->
+    <script><![CDATA[
+        /* checks if specified URL is valid for download */
+        String stringBeforeIfExists(String text,String beforeString) { 
+            if (text.indexOf(beforeString) > 0) {          
+            	return text.substring(0,text.indexOf(beforeString)).trim();
+           	} else{
+           		return text.trim();
+           	}
+        }
+
+        String stringAfterIfExists(String text,String afterString) {           
+       		if (text.indexOf(afterString) > 0) {
+            	return text.substring(text.indexOf(afterString)+afterString.length(),text.length()).trim();
+       		} else {
+       			return text.trim();
+       		}
+        
+        } 
+    ]]></script>
+
+	<!-- Get logon page to extract random & sessionid -->	
+	<var-def name="logonpage">
+		<html-to-xml>
+			<http url="${url}" method="get" cookie-policy="browser">
+				<http-header name="User-Agent"><var name="userAgent"/></http-header>
+			</http>
+		</html-to-xml>
+	</var-def>
+
+    <var-def name="sessionid">
+        <xpath expression="/html/body/descendant::*[name()='input'][@id='session-id']/@value">
+            <var name="logonpage"/>
+        </xpath>
+    </var-def>
+
+    <var-def name="randomid">
+        <xpath expression="/html/body/descendant::*[name()='input'][@id='random-id']/@value">
+            <var name="logonpage"/>
+        </xpath>
+    </var-def>
+
+	<!-- Execute logon -->
+	<var-def name="masterhash"><schoolonlinebe-masterhash sessionid="${sessionid}" randomid="${randomid}" login="${login}" password="${pwd}"/></var-def>
+	<http url="${urllogin}?&amp;SessionID=${sessionid}&amp;MasterHash=${masterhash}" method="get" cookie-policy="browser">
+		<http-header name="User-Agent"><var name="userAgent"/></http-header>
+	</http>
+	
+	<!-- Get basic puntenboek page so we can extract "ArrayPeriodes" and "ArrayVLLK" -->
+	<var-def name="basePuntenBoek">
+		<html-to-xml>
+			<http url="${urlpunten}&amp;SessionID=${sessionid}" method="post" cookie-policy="browser"/>
+		</html-to-xml>
+	</var-def>
+	<var-def name="dataArrays">
+		<xquery>
+			<xq-param name="doc">
+				<html-to-xml>
+					<http url="${urlpunten}&amp;SessionID=${sessionid}" method="post" cookie-policy="browser"/>
+				</html-to-xml>
+			</xq-param>
+			<xq-expression><![CDATA[
+				declare variable $doc as node() external;
+				for $record in $doc/html/head/script[contains(.,'ArrayPeriodes')]
+					return
+						<data>
+							<ArrayPeriodes>{translate(normalize-space(substring-before(substring-after(data($record),'ArrayPeriodes = {'),'};')),'"','')}</ArrayPeriodes>
+							<ArrayVLLK>{translate(normalize-space(substring-before(substring-after(data($record),'ArrayVLLK = {'),'};')),'"','')}</ArrayVLLK>
+						</data>
+			]]></xq-expression>
+		</xquery>		
+	</var-def>
+
+	<var-def name="vllks">
+		<template><![CDATA[ <?xml version="1.0" encoding="UTF-8"?><vllks>]]></template>
+	    <loop item="vllk" index="i">
+	        <list>
+				<tokenize delimiters=",">
+				        <xpath expression="data(/data/ArrayVLLK)">
+				            <var name="dataArrays"/>
+				        </xpath>		          
+				</tokenize>
+	        </list>	
+	        <body>
+	        	<empty>
+		        	<var-def name="vllkId"><template>${stringBeforeIfExists(vllk.toString(),":")}</template></var-def>
+		       		<var-def name="vllkName"><template>${stringAfterIfExists(vllk.toString(),":")}</template></var-def>
+	       		</empty>
+	        	<template><![CDATA[<vllk id="${vllkId}" name="${vllkName}">]]></template>
+			    <loop item="periode" index="j" filter="1,3,4,6,7,8">
+			        <list>
+						<tokenize delimiters=",">
+						        <xpath expression="data(/data/ArrayPeriodes)">
+						            <var name="dataArrays"/>
+						        </xpath>		          
+						</tokenize>
+			        </list>	
+			        <body>
+			        	<empty>
+							<var-def name="periodeId"><template>${stringBeforeIfExists(periode.toString(),":")}</template></var-def>
+							<var-def name="periodeName"><template>${stringAfterIfExists(periode.toString(),":")}</template></var-def>
+							<var-def name="overzicht">
+								<html-to-xml>
+									<http url="${urlpuntenEdit}&amp;SessionID=${sessionid}&amp;PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=${vllkId}&amp;PuntenboekLeerkrachtViewStatePeriodeID=${periodeId}" method="post" cookie-policy="browser"/>
+								</html-to-xml>
+							</var-def>
+	                        <var-def name="numberOfStudents">
+	                            <xpath expression="count(//table[@id='PuntenKop']/tbody/tr/td/a/img)">
+	                                <var name="overzicht"/>
+	                            </xpath>                        
+	                        </var-def>
+							<!--
+							<file action="write" path="/home/thomas/projects/SarahHomeWork/CommentPOC1/work/rapportSingle_${vllkId}_${periodeId}.xml">
+								<var name="overzicht"/>	
+							</file>								
+							-->
+						</empty>
+						<template><![CDATA[<periode id="${periodeId}" name="${periodeName}"><rapport><name>DUMMY</name></rapport><rapport><name>DUMMY</name></rapport>]]></template><!-- add 2 dummy report to force Array in json -->
+						<loop item="rapport" index="k">
+							<list>
+								<xpath expression="//table[@id='PuntenOverzicht']/tbody/tr[1]/th[./div[@class='r']]">
+									<var name="overzicht"/>
+								</xpath>
+							</list>
+							<body>
+								<template><![CDATA[<rapport>]]></template>
+								<template><![CDATA[<name>]]></template>
+									<xpath expression="normalize-space(substring-after(concat(/th[1]/div[1]/div[1]/ul[1]/li[1]/text()[1],/th[1]/div[1]/div[1]/ul[1]/li[1]/i/text()[1]),'Omschrijving:'))">
+										<var name="rapport"/>
+									</xpath>
+								<template><![CDATA[</name>]]></template>								
+								<template><![CDATA[<date>]]></template>
+									<xpath expression="normalize-space(substring-after(concat(/th[1]/div[1]/div[1]/ul[1]/li[contains(text()[1],'Datum')]/text()[1],/th[1]/div[1]/div[1]/ul[1]/li[contains(text()[1],'Datum')]/i/text()[1]),'Datum:'))">
+										<var name="rapport"/>
+									</xpath>
+								<template><![CDATA[</date>]]></template>
+								<empty>
+									<var-def name="telling">
+										<xpath expression="normalize-space(concat(/th[1]/div[1]/text()[position() = last()],/th[1]/div[1]/a[1]/text()[position() = last()]))">
+											<var name="rapport"/>
+										</xpath>									
+									</var-def>
+								</empty>
+																
+								<template><![CDATA[<maxPuntBeforeReCalc>${stringBeforeIfExists(telling.toString(),"&rarr;")}</maxPuntBeforeReCalc>]]></template>
+								<template><![CDATA[<maxPuntAfterReCalc>${stringAfterIfExists(telling.toString(),"&rarr;")}</maxPuntAfterReCalc>]]></template>
+								<loop item="leerling" index="l">
+									<list>
+										<xpath expression="//table[@id='PuntenOverzicht']/tbody/tr[position() &gt; 0][position() &lt; (${numberOfStudents}+2)]/td[${k}]">
+											<var name="overzicht"/>
+										</xpath>
+									</list>			
+									<body>
+										<template><![CDATA[<leerling id="${l}">]]></template>
+										<template><![CDATA[<punt>]]></template>
+											<xpath expression="concat(/td/abbr/text()[1],/td/abbr/i/text()[1],/td/text()[1])">
+												<var name="leerling"/>
+											</xpath>
+										<template><![CDATA[</punt>]]></template>								
+										<template><![CDATA[<comment>]]></template>
+											<xpath expression="/td/abbr/@title">
+												<var name="leerling"/>
+											</xpath>
+										<template><![CDATA[</comment>]]></template>
+
+										<template><![CDATA[</leerling>]]></template>
+									</body>							
+								</loop>																
+								<template><![CDATA[</rapport>]]></template>
+							</body>							
+						</loop>
+						<template><![CDATA[</periode>]]></template>
+			        </body>
+			   	</loop>
+				<template><![CDATA[</vllk>]]></template>
+	        </body>
+	    </loop>
+	    <template><![CDATA[</vllks>]]></template>
+	</var-def>	
+	<!--
+	<file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/work/whatever.xml">
+		<var name="vllks"/>
+	</file>
+    <file action="write" path="data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
+    <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
+    <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>   
+	-->
+	<file action="write" path="${output}"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
+</config>			

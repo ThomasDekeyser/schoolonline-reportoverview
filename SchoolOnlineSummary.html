@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SchoolOnline Data v1.1.5</title>
+<link rel="stylesheet" href="./lib/jquery-ui.css" />
+<script src="./lib/jquery-1.8.3.js"></script>
+<script src="./lib/jquery-ui.1.10.0.js"></script>
+<script src="./lib/overlib_mini.js"></script>
+<script src="./lib/rounding.js"></script>
+<script src="./data/result.json.js"></script>
+<script src="./lib/load.js"></script>
+<style>
+@media screen {
+	.printheader {
+		display:none;
+	}
+	
+	th.hfirst {
+		width: 0.4em;
+	}
+	.perVak td, perVak th 
+	{
+		font-size:1em;
+		border:1px solid #98bf21;
+		padding:3px 7px 2px 7px;
+		vertical-align:top;
+	}
+	.perVak th
+	{
+		font-size:0.8em;
+		text-align:left;
+		padding-top:5px;
+		padding-bottom:4px;
+		background-color:#A7C942;
+		width:11em;
+		word-wrap:break-word;
+		color:#fff;
+	}
+	.perVak div.comment
+	{
+		width:11em;
+		word-wrap:break-word;
+		font-size:0.8em;
+	}
+
+	tr:nth-child(even) {
+		background-color: #EEE;
+	}
+	 
+	tr:nth-child(odd) {
+		background-color: #FFF;
+	}
+
+	.perLeerling td, .perVak th 
+	{
+		font-size:1em;
+		border:1px solid #98bf21;
+		padding:3px 7px 2px 7px;
+		vertical-align:top;
+	}
+	.perLeerling th
+	{
+		font-size:0.8em;
+		text-align:left;
+		padding-top:5px;
+		padding-left:7px;
+		padding-bottom:4px;
+		background-color:#A7C942;
+		color:#fff;
+	}	
+
+	.tr.alt td 
+	{
+		color:#000;
+		background-color:#EAF2D3;
+	}
+	.button {
+		border-radius: 0.5em 0.5em 0.5em 0.5em;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		cursor: pointer;
+		display: inline-block;
+		font: 14px/100% Arial,Helvetica,sans-serif;
+		margin: 0 2px;
+		outline: medium none;
+		padding: 0.5em 2em 0.55em;
+		text-align: center;
+		text-decoration: none;
+		text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+		vertical-align: baseline;
+		background: -moz-linear-gradient(center top , #00ADEE, #0078A5) repeat scroll 0 0 transparent;
+		border: 1px solid #0076A3;
+		color: #D9EEF7;
+	}
+}
+
+@media print {
+	#mytabsul, #tabs-ll-select {
+		display: none;
+	}
+	td, th{
+		border: 1px solid #000000;
+	}
+
+	tr:nth-child(even) {
+		background-color: #EEE;
+	}
+	 
+	tr:nth-child(odd) {
+		background-color: #FFF;
+	}
+	body {
+		font-size: 0.5em;
+	}
+}
+</style>
+<script>
+try {
+    	addEventListener("load", function() {
+			$(function() {
+				loadTabs();
+				initPopupFields();
+				$( "#tabs" ).tabs();
+			});
+			
+			$('#hideComment').click(function() {
+				$('.comment').toggle();				
+				initPopupFields();
+			});
+
+			$('select[id^="select-ll-"]').change(function(){				
+				var selectedVllks = $(this).val();			
+				$(this).parent().next().find('tr[id^="vllk-"]').each(function(index) {
+					var rId = $(this).attr("id");
+					var isSelected=false;
+					for(var i in selectedVllks) {
+						if (rId.indexOf('vllk-'+selectedVllks[i]+'-') >= 0) {
+							isSelected = true;
+							break;
+						} 
+					}
+					if (isSelected) {
+						$(this).show();
+					} else {
+						$(this).hide();
+					}					
+				});
+				
+				//Change print header
+				var ptext = $(this).parent().prev().text();				
+				if (ptext.indexOf(':') >= 0) {
+					var selectedVakken="";
+					for(var i in selectedVllks) {
+						if (selectedVakken.length > 0) {
+							selectedVakken +=', ';
+						}
+						selectedVakken +=$(this).find('option:eq('+selectedVllks[i]+')').text();
+					}
+					$(this).parent().prev().text(ptext.split(/:/)[0]+': '+selectedVakken);
+				}
+			});			
+			
+	    },0);
+} catch(e) { log(e); throw(e) }	
+	
+
+</script>
+</head>
+<body>
+<div id="tabs">
+<ul id="mytabsul">
+	<li><div id="hideComment" class="button">Schakel commentaar</div></li>
+</ul>
+<div id="mytabdata"/>
+</div>
+</body>
