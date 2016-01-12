@@ -4,15 +4,19 @@
 	<!-- EDIT credentials at schoolonline.be -->
 	<var-def name="login">sarah.claeys@sintjv.be</var-def>
 	<var-def name="pwd"></var-def>
+	<!-- enable for easier debugging
+	<var-def name="output">/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/data/result.json.js</var-def>
+	-->
 
 
 	<!-- DO NOT EDIT -->
-	<var-def name="url"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWStart.php]]></var-def>
-	<var-def name="urllogin"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWLogIn.php]]></var-def>
-	<var-def name="urlpunten"><![CDATA[https://bsvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
-	<var-def name="urlpuntenEdit"><![CDATA[https://bsvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
-	<var-def name="url2"><![CDATA[https://bsvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=601&PuntenboekLeerkrachtViewStatePeriodeID=74]]></var-def>
-	<var-def name="userAgent"><![CDATA[Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:36.0) Gecko/20100101 Firefox/36.0]]></var-def>
+	<var-def name="url"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWStartLogin.php]]></var-def>
+	<var-def name="urllogin"><![CDATA[http://www17.schoolonline.be/bsvisitatie/FWLogin/FWLogIn.php]]></var-def>
+	<var-def name="urlpunten"><![CDATA[https://www17.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
+	<var-def name="urlpuntenEdit"><![CDATA[https://www17.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
+	<var-def name="url2"><![CDATA[https://www17.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=601&PuntenboekLeerkrachtViewStatePeriodeID=74]]></var-def>
+	<var-def name="userAgent"><![CDATA[Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:41.0) Gecko/20100101 Firefox/41.0]]></var-def>
+
 
     <!-- define script functions and variables -->
     <script><![CDATA[
@@ -57,9 +61,15 @@
     </var-def>
 
 	<!-- Execute logon -->
-	<var-def name="masterhash"><schoolonlinebe-masterhash sessionid="${sessionid}" randomid="${randomid}" login="${login}" password="${pwd}"/></var-def>
-	<http url="${urllogin}?&amp;SessionID=${sessionid}&amp;MasterHash=${masterhash}" method="get" cookie-policy="browser">
+	<http url="${urllogin}?SessionID=${sessionid}&amp;SessionFWLanguageID=2" method="post" cookie-policy="browser">
 		<http-header name="User-Agent"><var name="userAgent"/></http-header>
+		<http-header name="Content-Type">application/x-www-form-urlencoded</http-header>
+		
+		<http-param name="username_hidden"><var name="login"/></http-param>
+		<http-param name="password_hidden"><var name="pwd"/></http-param>
+		<http-param name="l"><var name="login"/></http-param>
+		<http-param name="p"><var name="pwd"/></http-param>
+
 	</http>
 	
 	<!-- Get basic puntenboek page so we can extract "ArrayPeriodes" and "ArrayVLLK" -->
