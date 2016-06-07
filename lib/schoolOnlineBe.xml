@@ -11,11 +11,10 @@
 
 	<!-- DO NOT EDIT -->
 	<var-def name="url"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWStartLogin.php]]></var-def>
-	<var-def name="urllogin"><![CDATA[http://www17.schoolonline.be/bsvisitatie/FWLogin/FWLogIn.php]]></var-def>
-	<var-def name="urlpunten"><![CDATA[https://www17.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
-	<var-def name="urlpuntenEdit"><![CDATA[https://www17.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
-	<var-def name="url2"><![CDATA[https://www17.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=601&PuntenboekLeerkrachtViewStatePeriodeID=74]]></var-def>
-	<var-def name="userAgent"><![CDATA[Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:41.0) Gecko/20100101 Firefox/41.0]]></var-def>
+	<var-def name="urllogin"><![CDATA[https://www15.schoolonline.be/bsvisitatie/FWLogin/FWLogIn.php]]></var-def>
+	<var-def name="urlpunten"><![CDATA[https://www15.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
+	<var-def name="urlpuntenEdit"><![CDATA[https://www15.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
+	<var-def name="userAgent"><![CDATA[Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:46.0) Gecko/20100101 Firefox/46.0]]></var-def>
 
 
     <!-- define script functions and variables -->
@@ -42,7 +41,7 @@
 	<!-- Get logon page to extract random & sessionid -->	
 	<var-def name="logonpage">
 		<html-to-xml>
-			<http url="${url}" method="get" cookie-policy="browser">
+			<http url="${url}" method="get" cookie-policy="default">
 				<http-header name="User-Agent"><var name="userAgent"/></http-header>
 			</http>
 		</html-to-xml>
@@ -61,28 +60,29 @@
     </var-def>
 
 	<!-- Execute logon -->
-	<http url="${urllogin}?SessionID=${sessionid}&amp;SessionFWLanguageID=2" method="post" cookie-policy="browser">
+	<var-def name="postLogon">
+	<http url="${urllogin}?SessionID=${sessionid}&amp;SessionFWLanguageID=2" method="post" cookie-policy="default">
 		<http-header name="User-Agent"><var name="userAgent"/></http-header>
 		<http-header name="Content-Type">application/x-www-form-urlencoded</http-header>
 		
-		<http-param name="username_hidden"><var name="login"/></http-param>
-		<http-param name="password_hidden"><var name="pwd"/></http-param>
+		<http-param name="username_hidden"></http-param>
+		<http-param name="password_hidden"></http-param>
 		<http-param name="l"><var name="login"/></http-param>
 		<http-param name="p"><var name="pwd"/></http-param>
-
 	</http>
+	</var-def>
 	
 	<!-- Get basic puntenboek page so we can extract "ArrayPeriodes" and "ArrayVLLK" -->
 	<var-def name="basePuntenBoek">
 		<html-to-xml>
-			<http url="${urlpunten}&amp;SessionID=${sessionid}" method="post" cookie-policy="browser"/>
+			<http url="${urlpunten}&amp;SessionID=${sessionid}" method="post" cookie-policy="default"/>
 		</html-to-xml>
 	</var-def>
 	<var-def name="dataArrays">
 		<xquery>
 			<xq-param name="doc">
 				<html-to-xml>
-					<http url="${urlpunten}&amp;SessionID=${sessionid}" method="post" cookie-policy="browser"/>
+					<http url="${urlpunten}&amp;SessionID=${sessionid}" method="post" cookie-policy="default"/>
 				</html-to-xml>
 			</xq-param>
 			<xq-expression><![CDATA[
@@ -127,7 +127,7 @@
 							<var-def name="periodeName"><template>${stringAfterIfExists(periode.toString(),":")}</template></var-def>
 							<var-def name="overzicht">
 								<html-to-xml>
-									<http url="${urlpuntenEdit}&amp;SessionID=${sessionid}&amp;PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=${vllkId}&amp;PuntenboekLeerkrachtViewStatePeriodeID=${periodeId}" method="post" cookie-policy="browser"/>
+									<http url="${urlpuntenEdit}&amp;SessionID=${sessionid}&amp;PuntenboekLeerkrachtViewStateVakLinkLeerkrachtKlasID=${vllkId}&amp;PuntenboekLeerkrachtViewStatePeriodeID=${periodeId}" method="post" cookie-policy="default"/>
 								</html-to-xml>
 							</var-def>
 	                        <var-def name="numberOfStudents">
@@ -204,12 +204,12 @@
 	    <template><![CDATA[</vllks>]]></template>
 	</var-def>	
 	<!--
-	<file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/work/whatever.xml">
+	<file action="write" path="/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/work/whatever.xml">
 		<var name="vllks"/>
 	</file>
     <file action="write" path="data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
     <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
-    <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>   
-	-->
+    <file action="write" path="/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>   
+    -->
 	<file action="write" path="${output}"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
 </config>			

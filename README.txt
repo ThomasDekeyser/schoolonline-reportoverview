@@ -18,6 +18,12 @@ Installatie:
 
 
 Release notes
+=========================================================================================
+v1.1.6 (2016/06/07)
+* bugfix: login werkte niet meer, cookie-policy gewijzigd
+
+Known issues:
+* Letters met accenten (é,è,...) worden niet goed afgebeeld.
 
 =========================================================================================
 v1.1.5 (2015/03/24)
