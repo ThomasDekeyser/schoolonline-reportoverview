@@ -10,10 +10,10 @@
 
 
 	<!-- DO NOT EDIT -->
-	<var-def name="url"><![CDATA[https://bsvisitatie.schoolonline.be/FWLogin/FWStartLogin.php]]></var-def>
-	<var-def name="urllogin"><![CDATA[https://www15.schoolonline.be/bsvisitatie/FWLogin/FWLogIn.php]]></var-def>
-	<var-def name="urlpunten"><![CDATA[https://www15.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
-	<var-def name="urlpuntenEdit"><![CDATA[https://www15.schoolonline.be/bsvisitatie/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
+	<var-def name="url"><![CDATA[https://basisschoolvisitatie.schoolonline.be/Login/StartLogin.php]]></var-def>
+	<var-def name="urllogin"><![CDATA[https://basisschoolvisitatie.schoolonline.be/Login/LogIn.php]]></var-def>
+	<var-def name="urlpunten"><![CDATA[https://basisschoolvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtList.php?]]></var-def>
+	<var-def name="urlpuntenEdit"><![CDATA[https://basisschoolvisitatie.schoolonline.be/PuntenboekLeerkracht/PuntenboekLeerkrachtEdit.php?]]></var-def>
 	<var-def name="userAgent"><![CDATA[Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:46.0) Gecko/20100101 Firefox/46.0]]></var-def>
 
 
@@ -210,6 +210,6 @@
     <file action="write" path="data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
     <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
     <file action="write" path="/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>   
-    -->
+	-->
 	<file action="write" path="${output}"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
 </config>			
