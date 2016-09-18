@@ -19,6 +19,14 @@ Installatie:
 
 Release notes
 =========================================================================================
+v1.1.8 (2016/09/18)
+* bugfix: fix om "numberOfStudents" te berekenen door wijzigingen van pagina binnen schoolonline
+
+Known issues:
+* Letters met accenten (é,è,...) worden niet goed afgebeeld.
+
+
+=========================================================================================
 v1.1.7 (2016/09/17)
 * bugfix: URLs gewijzigd
 

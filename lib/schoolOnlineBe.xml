@@ -131,7 +131,7 @@
 								</html-to-xml>
 							</var-def>
 	                        <var-def name="numberOfStudents">
-	                            <xpath expression="count(//table[@id='PuntenKop']/tbody/tr/td/a/img)">
+	                            <xpath expression="count(//table[@id='PuntenKop']/tbody/tr/td/input[starts-with(@id,'LeerlingLoopbaanID')])">
 	                                <var name="overzicht"/>
 	                            </xpath>                        
 	                        </var-def>
@@ -210,6 +210,7 @@
     <file action="write" path="data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
     <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
     <file action="write" path="/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>   
-	-->
+    -->
 	<file action="write" path="${output}"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
+	
 </config>			
