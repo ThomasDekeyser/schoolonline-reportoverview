@@ -19,6 +19,14 @@ Installatie:
 
 Release notes
 =========================================================================================
+v1.1.9 (2017/02/26)
+* bugfix: xml escape toegevoegd op rapport namen en commentaarlijnen
+
+Known issues:
+* Letters met accenten (é,è,...) worden niet goed afgebeeld.
+
+
+=========================================================================================
 v1.1.8 (2016/09/18)
 * bugfix: fix om "numberOfStudents" te berekenen door wijzigingen van pagina binnen schoolonline
 

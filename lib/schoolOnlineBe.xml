@@ -149,11 +149,16 @@
 								</xpath>
 							</list>
 							<body>
+								<empty>
+									<var-def name="rapportName">
+										<xpath expression="normalize-space(substring-after(concat(/th[1]/div[1]/div[1]/ul[1]/li[1]/text()[1],/th[1]/div[1]/div[1]/ul[1]/li[1]/i/text()[1]),'Omschrijving:'))">
+											<var name="rapport"/>
+										</xpath>										
+									</var-def>
+								</empty>
 								<template><![CDATA[<rapport>]]></template>
-								<template><![CDATA[<name>]]></template>
-									<xpath expression="normalize-space(substring-after(concat(/th[1]/div[1]/div[1]/ul[1]/li[1]/text()[1],/th[1]/div[1]/div[1]/ul[1]/li[1]/i/text()[1]),'Omschrijving:'))">
-										<var name="rapport"/>
-									</xpath>
+								<template><![CDATA[<name>${sys.escapeXml(rapportName)}]]></template>
+
 								<template><![CDATA[</name>]]></template>								
 								<template><![CDATA[<date>]]></template>
 									<xpath expression="normalize-space(substring-after(concat(/th[1]/div[1]/div[1]/ul[1]/li[contains(text()[1],'Datum')]/text()[1],/th[1]/div[1]/div[1]/ul[1]/li[contains(text()[1],'Datum')]/i/text()[1]),'Datum:'))">
@@ -175,20 +180,22 @@
 										<xpath expression="//table[@id='PuntenOverzicht']/tbody/tr[position() &gt; 0][position() &lt; (${numberOfStudents}+2)]/td[${k}]">
 											<var name="overzicht"/>
 										</xpath>
-									</list>			
+									</list>		
 									<body>
+										<empty>
+											<var-def name="myComment">
+												<xpath expression="/td/abbr/@title">
+													<var name="leerling"/>
+												</xpath>											
+											</var-def>
+										</empty>											
 										<template><![CDATA[<leerling id="${l}">]]></template>
 										<template><![CDATA[<punt>]]></template>
 											<xpath expression="concat(/td/abbr/text()[1],/td/abbr/i/text()[1],/td/text()[1])">
 												<var name="leerling"/>
 											</xpath>
 										<template><![CDATA[</punt>]]></template>								
-										<template><![CDATA[<comment>]]></template>
-											<xpath expression="/td/abbr/@title">
-												<var name="leerling"/>
-											</xpath>
-										<template><![CDATA[</comment>]]></template>
-
+										<template><![CDATA[<comment>${sys.escapeXml(myComment)}</comment>]]></template>
 										<template><![CDATA[</leerling>]]></template>
 									</body>							
 								</loop>																
@@ -203,14 +210,18 @@
 	    </loop>
 	    <template><![CDATA[</vllks>]]></template>
 	</var-def>	
+	
 	<!--
 	<file action="write" path="/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/work/whatever.xml">
 		<var name="vllks"/>
 	</file>
     <file action="write" path="data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
-    <file action="write" path="/home/thomas/projects/SarahHomeWork/ReportOverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
+    -->
+    
+    <!--
     <file action="write" path="/home/thomas/projects/SarahHomeWork/schoolonline-reportoverview/data/result.json.js"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>   
     -->
+    
 	<file action="write" path="${output}"><template><![CDATA[var vllksJson=]]></template><xml-to-json><var name="vllks"/></xml-to-json><template><![CDATA[;]]></template></file>
 	
 </config>			
